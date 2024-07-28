@@ -1,0 +1,143 @@
+[gd_scene load_steps=21 format=3 uid="uid://2hnhl78pssta"]
+
+[ext_resource type="Script" path="res://scripts/player_char.gd" id="1_i2xul"]
+[ext_resource type="Shader" path="res://scripts/stage.gdshader" id="1_kd2le"]
+[ext_resource type="Texture2D" uid="uid://cpw1kldldj11t" path="res://AnimSheet.png" id="3_7qghu"]
+[ext_resource type="Script" path="res://scripts/AimRing.gd" id="3_a08eb"]
+[ext_resource type="Script" path="res://scripts/FSM.gd" id="3_i5vq6"]
+[ext_resource type="Texture2D" uid="uid://bfd3fpn1ixlov" path="res://Untitled_Artwork_j64.png" id="3_ovn6n"]
+[ext_resource type="Script" path="res://scripts/states/Idle.gd" id="4_k80xw"]
+[ext_resource type="Script" path="res://scripts/HitBox.gd" id="4_swndv"]
+[ext_resource type="Script" path="res://scripts/states/NormalMovement.gd" id="5_xptf6"]
+[ext_resource type="Script" path="res://scripts/states/ShieldedMovement.gd" id="6_gia4r"]
+[ext_resource type="Script" path="res://scripts/states/PlayerDefeated.gd" id="11_ma1np"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hv732"]
+atlas = ExtResource("3_7qghu")
+region = Rect2(3, 2, 36, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h28ai"]
+atlas = ExtResource("3_7qghu")
+region = Rect2(42, 2, 36, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fehuo"]
+atlas = ExtResource("3_7qghu")
+region = Rect2(81, 2, 36, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_japff"]
+atlas = ExtResource("3_7qghu")
+region = Rect2(120, 2, 36, 36)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v77qa"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hv732")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h28ai")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fehuo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_japff")
+}],
+"loop": false,
+"name": &"expand",
+"speed": 16.0
+}]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jk5q2"]
+shader = ExtResource("1_kd2le")
+shader_parameter/brightness = 0.0
+shader_parameter/saturation = 0.5
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_25x0a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_ovn6n")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ntpv5"]
+height = 50.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_khk4a"]
+radius = 31.7805
+
+[node name="PlayerChar" type="CharacterBody2D"]
+collision_layer = 33
+collision_mask = 48
+motion_mode = 1
+wall_min_slide_angle = 0.785398
+script = ExtResource("1_i2xul")
+
+[node name="ShieldBack" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_v77qa")
+animation = &"expand"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+material = SubResource("ShaderMaterial_jk5q2")
+sprite_frames = SubResource("SpriteFrames_25x0a")
+
+[node name="ShieldFront" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_v77qa")
+animation = &"expand"
+
+[node name="HitBox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("4_swndv")
+
+[node name="RegularHitBox" type="CollisionShape2D" parent="HitBox"]
+visible = false
+shape = SubResource("CapsuleShape2D_ntpv5")
+
+[node name="CircumBox" type="CollisionShape2D" parent="HitBox"]
+visible = false
+shape = SubResource("CircleShape2D_khk4a")
+disabled = true
+
+[node name="RegularCollisionShape" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_ntpv5")
+
+[node name="Circumshape" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_khk4a")
+disabled = true
+
+[node name="AimRing" type="Node2D" parent="."]
+script = ExtResource("3_a08eb")
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("3_i5vq6")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="FSM"]
+script = ExtResource("4_k80xw")
+
+[node name="NormalMovement" type="Node" parent="FSM"]
+script = ExtResource("5_xptf6")
+
+[node name="ShieldedMovement" type="Node" parent="FSM"]
+script = ExtResource("6_gia4r")
+
+[node name="PlayerDefeated" type="Node" parent="FSM"]
+script = ExtResource("11_ma1np")
+
+[node name="HitTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="defeated" from="." to="." method="_on_defeated"]
+[connection signal="shot_fired" from="." to="." method="_on_shot_fired"]
+[connection signal="body_entered" from="HitBox" to="HitBox" method="_on_body_entered"]
+[connection signal="body_hit" from="HitBox" to="." method="_on_body_hit"]
+[connection signal="shield_hit" from="HitBox" to="." method="_on_shield_hit"]
+[connection signal="aim_changed" from="AimRing" to="AimRing" method="_on_aim_changed"]
+[connection signal="timeout" from="HitTimer" to="." method="_on_hit_timer_timeout"]

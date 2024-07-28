@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://fv5sjpx282kj"]
+
+[ext_resource type="Script" path="res://scripts/insp_object.gd" id="1_f4tq7"]
+[ext_resource type="Texture2D" uid="uid://vgm5xa7scbgi" path="res://multi_sprite.png" id="2_sxb2u"]
+[ext_resource type="Texture2D" uid="uid://doqnpmxe5pbdf" path="res://slow_sprite.png" id="3_32jnn"]
+[ext_resource type="Texture2D" uid="uid://otku560mfeq6" path="res://spark_sprite.png" id="4_6mqqg"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8qn15"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_sxb2u")
+}],
+"loop": true,
+"name": &"multi",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_32jnn")
+}],
+"loop": true,
+"name": &"slow",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_6mqqg")
+}],
+"loop": true,
+"name": &"spark",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_w2a15"]
+radius = 18.0
+
+[node name="InspObject" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_f4tq7")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_8qn15")
+animation = &"spark"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_w2a15")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -1,0 +1,127 @@
+[gd_scene load_steps=18 format=3 uid="uid://d4cj27amyefcs"]
+
+[ext_resource type="Script" path="res://scripts/MeleeCharger.gd" id="1_gow0y"]
+[ext_resource type="Texture2D" uid="uid://cf87ptibm3fbr" path="res://shade_00_idle.png" id="2_d6px0"]
+[ext_resource type="Texture2D" uid="uid://o11focc6845q" path="res://shade_01_idle.png" id="3_04rrl"]
+[ext_resource type="Script" path="res://scripts/FSM.gd" id="4_ed42x"]
+[ext_resource type="Texture2D" uid="uid://dj0mcw6qd70sn" path="res://encasement.png" id="4_gmjbe"]
+[ext_resource type="Script" path="res://scripts/states/EnemyIdle.gd" id="5_5268h"]
+[ext_resource type="Script" path="res://scripts/states/spawn.gd" id="5_5621t"]
+[ext_resource type="Texture2D" uid="uid://b2k7vldhrjxp8" path="res://encasement_1.png" id="5_q07s4"]
+[ext_resource type="Script" path="res://scripts/states/Pursue.gd" id="6_1cb7v"]
+[ext_resource type="Script" path="res://scripts/states/Poise.gd" id="6_d1j6a"]
+[ext_resource type="Script" path="res://scripts/states/EnemyDefeated.gd" id="7_ju0o5"]
+[ext_resource type="Script" path="res://scripts/states/Charge.gd" id="8_y0uhv"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bb4yg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_d6px0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_04rrl")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_lvc6f"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_gmjbe")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_q07s4")
+}],
+"loop": true,
+"name": &"pop",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_iegl5"]
+radius = 19.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_w7ng0"]
+radius = 256.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kjhvk"]
+radius = 64.0
+
+[node name="MeleeCharger" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 2
+motion_mode = 1
+script = ExtResource("1_gow0y")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-2, -3)
+sprite_frames = SubResource("SpriteFrames_bb4yg")
+frame_progress = 0.788636
+
+[node name="Encaser" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, -12)
+sprite_frames = SubResource("SpriteFrames_lvc6f")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_iegl5")
+
+[node name="VisionArea" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VisionArea"]
+shape = SubResource("CircleShape2D_w7ng0")
+
+[node name="AttackArea" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+shape = SubResource("CircleShape2D_kjhvk")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+collision_mask = 33
+collide_with_areas = true
+
+[node name="Container" type="Node" parent="."]
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("4_ed42x")
+initial_state = NodePath("Spawn")
+
+[node name="Spawn" type="Node" parent="FSM"]
+script = ExtResource("5_5621t")
+
+[node name="Idle" type="Node" parent="FSM"]
+script = ExtResource("5_5268h")
+
+[node name="Timer" type="Timer" parent="FSM/Idle"]
+wait_time = 5.0
+
+[node name="Pursue" type="Node" parent="FSM"]
+script = ExtResource("6_1cb7v")
+
+[node name="Poise" type="Node" parent="FSM"]
+script = ExtResource("6_d1j6a")
+
+[node name="Timer" type="Timer" parent="FSM/Poise"]
+
+[node name="Charge" type="Node" parent="FSM"]
+script = ExtResource("8_y0uhv")
+
+[node name="Defeated" type="Node" parent="FSM"]
+script = ExtResource("7_ju0o5")
+
+[connection signal="defeated" from="." to="." method="_on_defeated"]
+[connection signal="body_entered" from="VisionArea" to="FSM/Idle" method="_on_vision_area_body_entered"]
+[connection signal="body_exited" from="VisionArea" to="FSM/Pursue" method="_on_vision_area_body_exited"]
+[connection signal="body_entered" from="AttackArea" to="FSM/Pursue" method="_on_attack_area_body_entered"]
+[connection signal="timeout" from="FSM/Idle/Timer" to="FSM/Idle" method="_on_timeout"]
+[connection signal="timeout" from="FSM/Poise/Timer" to="FSM/Poise" method="_on_timer_timeout"]

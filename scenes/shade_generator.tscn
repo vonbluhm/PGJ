@@ -1,0 +1,88 @@
+[gd_scene load_steps=12 format=3 uid="uid://dg7hxtwusxed2"]
+
+[ext_resource type="Texture2D" uid="uid://cujlhfshqbkgv" path="res://shade_gen_00.png" id="1_7u5lq"]
+[ext_resource type="Script" path="res://scripts/shade_generator.gd" id="1_nf8rt"]
+[ext_resource type="Texture2D" uid="uid://b7ffibyyb1qjk" path="res://shade_gen_01.png" id="2_xn0eu"]
+[ext_resource type="PackedScene" uid="uid://d4cj27amyefcs" path="res://scenes/melee_charger.tscn" id="4_odkdq"]
+[ext_resource type="Texture2D" uid="uid://dj0mcw6qd70sn" path="res://encasement.png" id="4_sc0w0"]
+[ext_resource type="Script" path="res://scripts/FSM.gd" id="4_vkmwp"]
+[ext_resource type="Texture2D" uid="uid://b2k7vldhrjxp8" path="res://encasement_1.png" id="5_0r2yc"]
+[ext_resource type="Script" path="res://scripts/states/EnemyDefeated.gd" id="5_8eghu"]
+[ext_resource type="Script" path="res://scripts/states/EnemyIdleGen.gd" id="6_0xtbv"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jsmp8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_7u5lq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_xn0eu")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5o5xm"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_sc0w0")
+}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_0r2yc")
+}],
+"loop": true,
+"name": &"pop",
+"speed": 5.0
+}]
+
+[node name="ShadeGenerator" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 7
+motion_mode = 1
+script = ExtResource("1_nf8rt")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jsmp8")
+
+[node name="Encaser" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, -8)
+sprite_frames = SubResource("SpriteFrames_5o5xm")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, -23, 13, 17, -15, 17)
+
+[node name="Container" type="Node" parent="."]
+
+[node name="Subenemies" type="Node" parent="."]
+
+[node name="MeleeCharger" parent="Subenemies" instance=ExtResource("4_odkdq")]
+position = Vector2(234, 90)
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("4_vkmwp")
+initial_state = NodePath("IdleGen")
+
+[node name="IdleGen" type="Node" parent="FSM"]
+script = ExtResource("6_0xtbv")
+
+[node name="Defeated" type="Node" parent="FSM"]
+script = ExtResource("5_8eghu")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
+autostart = true
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+collision_mask = 63
+
+[connection signal="defeated" from="." to="." method="_on_defeated"]
+[connection signal="timeout" from="Timer" to="." method="_on_timeout"]

@@ -1,0 +1,53 @@
+[gd_scene load_steps=9 format=3 uid="uid://2hnhl78pssta"]
+
+[ext_resource type="Texture2D" uid="uid://batk8copbkbrw" path="res://player_sprite.png" id="1_cfuxv"]
+[ext_resource type="Script" path="res://scripts/player_char.gd" id="1_i2xul"]
+[ext_resource type="Script" path="res://scripts/FSM.gd" id="3_i5vq6"]
+[ext_resource type="Script" path="res://scripts/states/Idle.gd" id="4_k80xw"]
+[ext_resource type="Script" path="res://scripts/states/NormalMovement.gd" id="5_xptf6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_25x0a"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_cfuxv")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0wi1u"]
+radius = 17.1172
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_khk4a"]
+radius = 57.0088
+
+[node name="PlayerChar" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_i2xul")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_25x0a")
+
+[node name="RegularCollisionShape" type="CollisionShape2D" parent="."]
+position = Vector2(3, 0)
+shape = SubResource("CircleShape2D_0wi1u")
+
+[node name="Circumshape" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(-10, 0)
+shape = SubResource("CircleShape2D_khk4a")
+disabled = true
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("3_i5vq6")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="FSM"]
+script = ExtResource("4_k80xw")
+
+[node name="NormalMovement" type="Node" parent="FSM"]
+script = ExtResource("5_xptf6")
+
+[node name="ShieldedMovement" type="Node" parent="FSM"]

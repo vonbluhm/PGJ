@@ -1,0 +1,71 @@
+[gd_scene load_steps=9 format=3 uid="uid://vvjgvvayxhj8"]
+
+[ext_resource type="Script" path="res://scripts/Bullet.gd" id="1_xvk4m"]
+[ext_resource type="Texture2D" uid="uid://ci46dk0jpwom4" path="res://bullet_sprite.png" id="2_pnbmw"]
+[ext_resource type="Texture2D" uid="uid://tf48usg4q5u3" path="res://bullet_sprite_2.png" id="3_6tr0o"]
+[ext_resource type="Texture2D" uid="uid://cymr6ld5kgq27" path="res://bullet_sprite_1.png" id="3_dyodp"]
+[ext_resource type="Texture2D" uid="uid://pgy7s2yp587r" path="res://bullet_sprite_4.png" id="4_s345r"]
+[ext_resource type="Texture2D" uid="uid://dyifaglqc3rsq" path="res://bullet_sprite_3.png" id="5_x04ff"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qsgmu"]
+radius = 8.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nxat6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_pnbmw")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_6tr0o")
+}],
+"loop": true,
+"name": &"element_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_s345r")
+}],
+"loop": true,
+"name": &"element_2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_x04ff")
+}],
+"loop": true,
+"name": &"element_3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_dyodp")
+}],
+"loop": true,
+"name": &"pop",
+"speed": 5.0
+}]
+
+[node name="Bullet" type="Area2D"]
+collision_layer = 2
+collision_mask = 8
+script = ExtResource("1_xvk4m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_qsgmu")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_nxat6")
+animation = &"element_3"
+
+[node name="LifespanTimer" type="Timer" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="LifespanTimer" to="." method="_on_lifespan_timer_timeout"]

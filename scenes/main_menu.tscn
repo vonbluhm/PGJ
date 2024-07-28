@@ -1,0 +1,108 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhfwsorxmtpqr"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_qojt7"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="MainMenu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qojt7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartButton" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Start"
+
+[node name="OptionsButton" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Options"
+
+[node name="QuitButton" type="Button" parent="MainMenu/VBoxContainer"]
+layout_mode = 2
+text = "Quit"
+
+[node name="OptionsMenu" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="TabContainer" type="TabContainer" parent="OptionsMenu"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -67.5
+offset_right = 20.0
+offset_bottom = 67.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="OptionsMenu/TabContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="OptionsMenu/TabContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="OptionsMenu/TabContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="OptionsMenu/TabContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="OptionsMenu/TabContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="OptionsMenu/TabContainer/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+
+[node name="QuittingDialog" type="ConfirmationDialog" parent="."]
+title = "Are you sure you want to quit?"
+initial_position = 1
+size = Vector2i(300, 100)
+unresizable = true
+ok_button_text = "Yes"
+cancel_button_text = "No"
+
+[connection signal="pressed" from="MainMenu/VBoxContainer/StartButton" to="MainMenu" method="_on_start_button_pressed"]
+[connection signal="pressed" from="MainMenu/VBoxContainer/OptionsButton" to="MainMenu" method="_on_options_button_pressed"]
+[connection signal="button_down" from="MainMenu/VBoxContainer/QuitButton" to="MainMenu" method="_on_quit_button_button_down"]
+[connection signal="confirmed" from="QuittingDialog" to="MainMenu" method="_on_quitting_dialog_confirmed"]
